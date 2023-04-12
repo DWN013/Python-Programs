@@ -3,19 +3,20 @@
 #################################################
 import sys
 import os
-#import cmnt_to_html
-
-#Input filename that needs conversion, seperate extension from name
+#Input filename that needs conversion, seperate extension (.xyz) from name
 inName = sys.argv[1]
 fileName, file_exten = os.path.splitext(inName)
 
-#Output file result
-outName = fileName + "_final"
+#Output filename
+outName = fileName + "_"
 
 with open(inName, 'r') as inFile, open(outName, 'w') as outFile:
     for line in inFile:
-        outFile.write(line[10:])
+        formatted_cmnt = line.lstrip()
+        formatted_cmnt = formatted_cmnt[1:].lstrip()
+        if(formatted_cmnt[0:1] == '*'):
+            formatted_cmnt = formatted_cmnt[1:]
+        outFile.write(formatted_cmnt)
     inFile.close()
     outFile.close()
-
 #os.system(f"python3 cmnt_to_html.py, {outName}")

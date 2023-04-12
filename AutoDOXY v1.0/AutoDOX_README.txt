@@ -3,7 +3,7 @@ To properly use these 2 included scripts:
 1. Create a blank file
 
 2. Copy comments from original file into blank file such that they look approximately like this:
-   (Make sure the very first piece of text [not including ! or *] is 10 spaces away from the start)
+   Spaces do not matter, it is ok if there is no * character
 
   !     * DATE - NAME/NAME COMMENTCOMMENTCOMMENTCOMMENT:
   !     *                          - COMMENTCOMMENTCOMMENTCOMMENT

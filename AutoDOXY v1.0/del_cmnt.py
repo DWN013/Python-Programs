@@ -15,8 +15,8 @@ with open(inName, 'r') as inFile, open(outName, 'w') as outFile:
         formatted_cmnt = line.lstrip()
         formatted_cmnt = formatted_cmnt[1:].lstrip()
         if(formatted_cmnt[0:1] == '*'):
-            formatted_cmnt = formatted_cmnt[1:]
+            formatted_cmnt = formatted_cmnt[2:]
         outFile.write(formatted_cmnt)
     inFile.close()
     outFile.close()
-#os.system(f"python3 cmnt_to_html.py, {outName}")
+os.system(f"python3 cmnt_to_html.py {outName}")

@@ -24,13 +24,29 @@ with open(inName, 'r') as inFile, open(outName, 'w') as outFile:
         fields = line.split('|')
 
         #Split string into 3 sections, all text formatted on one line
+        #If there are not exactly three sections throw an error
+        if (len(fields) != 3):
+            print("Error: Check your pipes! \'|\'")
+            os.system(f"rm {fileName}_")
+            os.system(f"rm {outName}")
+            break
+
+        #3 section variables
         date = fields[0]
         names = fields[1]
         comments = fields[2]
         
-        date = date.rstrip()
-        date = date.lstrip().replace(" ", ". ")
-        names = names.replace(".", ". ")
+        date = date.strip()
+        if(". " in date):
+            date = date.replace(". ", ". ")
+        elif("." in date):
+            date = date.replace(".", ". ")
+        else:
+            date = date.replace(" ", ". ")
+        if(". " in names):
+            names = names.replace(". ", ". ")
+        else:
+            names = names.replace(".", ". ")
         ######################################################
         ## Error when encountering "::", treats it as a ": "
         ######################################################
@@ -58,3 +74,4 @@ with open(inName, 'r') as inFile, open(outName, 'w') as outFile:
         outFile.write(f"{formatted_line}")
         outFile.write(lineBrk + "\n")
     outFile.write("!!</table>")
+os.system(f"rm {fileName}_")

@@ -21,13 +21,9 @@ import os
 
 def calculate_T1():
 
-    for current_lat_val in range (len(GT_atm_copy['lat'])):
-        #x = float(input("Input the latitude:\n"))
-        
-        #x = current_lat_val
-        
+    for current_lat_arr_pos in range (len(GT_atm_copy['lat'])):    
         # Convert x to radians 
-        x = (current_lat_val * math.pi)/180
+        x = (GT_atm_copy['lat'].values[current_lat_arr_pos] * math.pi)/180
         # Function definitions
         xmax = math.pi/3
         y = (math.pi/2) * (x/xmax)
@@ -41,10 +37,10 @@ def calculate_T1():
         # Return result
         # if |φ| < π/3:
         if abs(x) < xmax:
-            GT_atm_copy[:, current_lat_val, :] = T_func
+            GT_atm_copy[:, current_lat_arr_pos, :] = T_func
         # Otherwise if |φ| > π/3  return 0:
         else:
-            GT_atm_copy[:, current_lat_val, :] = 0
+            GT_atm_copy[:, current_lat_arr_pos, :] = 0
 
 # This function is responsible for determining which forumla the user requests and can be added to in future if more formulas are desired
 # Additional formulas can be added by defining a function name below the most recent function/formula using def FUNC_NAME():
@@ -62,7 +58,7 @@ def function_selection(num):
         
 
 in_file = "CONDITIONS_v1.nc.999"
-out_file = "cloud_feedback_v1_results.nc"
+out_file = "cloud_feedback_results.nc"
 data = xr.open_dataset(in_file)
 
 GT_atm = data['GT_atm']
@@ -80,7 +76,7 @@ SIC_atm_copy[:] = 0.0
 what_form = int(input("Which SST forumla is needed? (select a number between 1-1):\n"))
 function_selection(what_form)
 
-modified_ds = xr.Dataset({'GT_atm': GT_atm_copy, 'SICN_atm': SICN_atm_copy, 'SIC_atm': SIC_atm})
+modified_ds = xr.Dataset({'GT_atm': GT_atm_copy, 'SICN_atm': SICN_atm_copy, 'SIC_atm': SIC_atm_copy})
 
 modified_ds.to_netcdf(out_file, 'w')
 

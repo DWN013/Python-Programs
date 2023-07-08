@@ -1,5 +1,5 @@
 # A. Ukhin - July 4, 2023
-# Version 1.0 of an implementation of a formula for use in netCDF file work
+# Version 1.1 of an implementation of a formula for use in netCDF file work
 
 import xarray as xr
 import math

@@ -1,6 +1,6 @@
 # A. Ukhin - July 12, 2023
 # Average Ozone Calculation for Aquaplanet config
-# This script create an average between opposite ends of lat. values for Ozone 
+# This script creates an average between all OZ values using time dimension and averages opposite ends of lat. values for Ozone 
 import xarray as xr
 import numpy as np
 import os

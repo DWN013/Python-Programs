@@ -18,6 +18,15 @@ import matplotlib.colors as colors
 from matplotlib.animation import FuncAnimation
 import glob
 # ===================================================================================
+# Gets README file for use of program
+def get_README():
+    try:
+        with open("README.txt", 'r') as file:
+            content = file.read()
+            print(content)
+    except FileNotFoundError:
+        print(f"File 'README.txt' not found.")
+# ===================================================================================
 # Generates pngs from a folder or file depending on user input
 # Folder/File can be hardcoded or user input in a specific directory
 def generate_pngs():
@@ -25,18 +34,21 @@ def generate_pngs():
     generation_from = str.lower(input("Are you generating from a folder? (No if only from one file)\n(Y)es\n(N)o\nAny other key to exit\n"))
     if(generation_from != 'y' and generation_from != 'n'): (exit())
     use_default = input("Use default directory?\n(Y)es\n(N)o\nAny other key to exit\n")
+    # Gets input for if using default or custom parameters
+    custom = str.lower(input("Set custom plot parameters?\n(Y)es\n(N)o or any other key (Uses system defaults)\n"))
+    # Decision for if folder and if custome PATH or default
     if(use_default == 'y'):
         # Following lines ues hardcoded path
         if(generation_from == 'y'):
-            create_plots_from_folder(file_folder_path)
+            create_plots_from_folder(file_folder_path, custom)
         elif(generation_from == 'n'):
-            create_plots_from_file(file_path)
+            create_plots_from_file(file_path, custom)
     elif(use_default == 'n'):
         # Following lines gets input path
         if(generation_from == 'y'):
-            create_plots_from_folder(input("Input folder path where files are located (/path/example/here)\n"))
+            create_plots_from_folder(input("Input folder path where files are located (/path/example/here)\n"), custom)
         elif(generation_from == 'n'):
-            create_plots_from_file(input("Input file path (/path/example/here/file.nc)\n"))
+            create_plots_from_file(input("Input file path (/path/example/here/file.nc)\n"), custom)
     else:
          exit()
     print("Saved plots")
@@ -56,15 +68,25 @@ def animate(frame):
     plt.imshow(plt.imread(png_files[frame]))
     # Remove axis from animated plot
     plt.axis('off')
+    # Remove the line below
     plt.title(f'Frame #{(frame+1)}')
 # ===================================================================================
 # Creates plots from a singular .nc file, assumes 365 days in a year but will work with a (theoretically) infinite amount ot timesteps without issue.
-def create_plots_from_file(input_file_path):
+def create_plots_from_file(input_file_path, iscustom):
     head, tail = os.path.split(input_file_path)
     dataset = xr.open_dataset(input_file_path)
     size_of_time = dataset['prw'].time.size
+    start_size_of_time = 0
+    end_size_of_time = size_of_time
+    # Ask user here about how many months/years they want to generate
+    if(iscustom == 'y'):
+        print(f"Total timesteps: {size_of_time}\n")
+        start_size_of_time = int(input("What timestep to start run at?\nTimestep num: "))
+        end_size_of_time = int(input("What timestep to end run at?\nTimestep num: "))
+    # Ask user if they want to set a custom cmap
+    cust_cmap = "gist_yarg"
     # Loops from 0 - 364
-    for time_step in range(size_of_time):
+    for time_step in range(start_size_of_time, end_size_of_time):
                     # Subset of the original data to generate a plot
                     # Squeezes down data to useable format for .plot()
                     subset_origin = dataset['prw'].isel(time = time_step).squeeze()
@@ -100,32 +122,37 @@ def create_plots_from_file(input_file_path):
                     # ax is the axes variable, transform creates a transformation of the data relevant to the projection used and is reccomended as 
                     # a standard inclusion regardless of projection, vmin and vmax provide min and max values for the colorbar, cmap provides the colour map to be used for the plot
                     # extend adds arrows to both ends of the colorbar to show out of bounds values
-                    subset_origin.plot(ax=ax, transform=ccrs.PlateCarree(), vmin=std_min, vmax=std_max, cmap="gist_yarg", extend='both')
+                    subset_origin.plot(ax=ax, transform=ccrs.PlateCarree(), vmin=std_min, vmax=std_max, cmap=cust_cmap, extend='both')
                     ax.coastlines()
                     ax.gridlines()
                     fig.savefig(image_out_name)
+def what_size(input_file_path):
+    head, tail = os.path.split(input_file_path)
+    dataset = xr.open_dataset(input_file_path)
+    size_of_time = dataset['prw'].time.size
+    print(size_of_time)
 # ===================================================================================
 # Function to create mutltiple plots from all files in a folder
 # Uses function create_plots_from_file() as a sub-function
-def create_plots_from_folder(path):
+def create_plots_from_folder(path, iscustom):
     for filename in os.listdir(path):
         if filename.endswith('.nc'):
             file_path = os.path.join(path, filename)
             # Checks if file path exists and calls file path with create_plots_from_file() function
             if os.path.isfile(file_path):
-                create_plots_from_file(file_path)
+                create_plots_from_file(file_path, iscustom)
 # ===================================================================================
 # Hardcoded paths to folder/file, replace as needed
 file_folder_path = "/space/hall5/sitestore/eccc/crd/ccrn/users/jcl001/jcl-retro-pi1850-1d0/data/nc_output/CMIP6/CCCma/CCCma/CanESM5-jcl-retro-pi1850-1d0/piControl/r1i1p1f1/Eday/prw/gn/v20190429"
 file_path = "/space/hall5/sitestore/eccc/crd/ccrn/users/jcl001/jcl-retro-pi1850-1d0/data/nc_output/CMIP6/CCCma/CCCma/CanESM5-jcl-retro-pi1850-1d0/piControl/r1i1p1f1/Eday/prw/gn/v20190429/prw_Eday_CanESM5-jcl-retro-pi1850-1d0_piControl_r1i1p1f1_gn_32500101-32501231.nc"
-
+test_path = "/space/hall5/sitestore/eccc/crd/ccrn/model_output/CMIP6/final/CMIP6/CMIP/CCCma/CanESM5/amip/r1i1p2f1/E3hr/prw/gn/v20190429/prw_E3hr_CanESM5_amip_r1i1p2f1_gn_195001010130-196012312230.nc"
 # ===================================================================================
 # Bounds for graph colourbars
 std_min = 5
 std_max = 85
 # ===================================================================================
 print("===================================================================================")
-action = input("Select an action:\n1. Generate files and animation\n2. Generate files\n3. Generate animation\nStop program (any other key)\n")
+action = input("Select an action:\n1. Generate files and animation\n2. Generate files\n3. Generate animation\n4. View instructions in README file\nStop program (any other key)\n")
 print("===================================================================================")
 # If action with animation animation name is prompted and confirmed
 if(action == '1' or action == '3'): 
@@ -159,12 +186,23 @@ elif((action) == '3'):
     animation = FuncAnimation(figX, animate, frames=len(png_files), interval=100)
     animation.save(f"{gif_name}.gif", writer='pillow')
     print("Created animated results")
+elif((action) == '4'):
+    get_README()
 # Debug action to view order of files, not necessary to run program
-#elif((action) == '4'):
+#elif((action) == '5'):
 #     sorted_files = get_sorted_png_files()
 #     for i in range(len(sorted_files)):
 #         print(sorted_files[i])
+#
+#elif((action) == '6'):
+#    what_size(test_path)
 # Kills program
 else:
     exit()
 # ===================================================================================
+
+
+
+
+
+

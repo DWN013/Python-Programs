@@ -124,11 +124,6 @@ def create_plots_from_file(input_file_path, iscustom):
                     ax.coastlines()
                     ax.gridlines()
                     fig.savefig(image_out_name)
-def what_size(input_file_path):
-    head, tail = os.path.split(input_file_path)
-    dataset = xr.open_dataset(input_file_path)
-    size_of_time = dataset['prw'].time.size
-    print(size_of_time)
 # ===================================================================================
 # Function to create mutltiple plots from all files in a folder
 # Uses function create_plots_from_file() as a sub-function

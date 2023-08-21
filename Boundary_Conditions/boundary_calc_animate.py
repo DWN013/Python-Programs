@@ -56,7 +56,7 @@ def generate_pngs():
 def get_sorted_png_files():
     # Glob module searchs for files that match a specific file pattern or name
     png_files = glob.glob("*.png")
-    #png_files.sort(key=lambda f: int(re.sub('\D', '', f)))
+    # Sorts by name, as such leading zeroes are required to ensure a correct sort
     png_files.sort()
     return png_files
 # ===================================================================================

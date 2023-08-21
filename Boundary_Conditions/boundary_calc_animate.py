@@ -3,8 +3,8 @@
 # A. Ukhin - August 8, 2023
 # -----------------------------------------------------------------------------------
 # Brief Description of Program:
-# Generates plots and animations to display water vapour movement over a years timespan
-# from a .nc file and applies it over a Robinson projection of Earth with a 
+# Generates plots and animations to display water vapour movement over an arbitrary 
+#timespan from a .nc file and applies it over a Robinson projection of Earth with a 
 # gist_yarg colour map 
 # ===================================================================================
 # Libraries necessesary for program
@@ -14,7 +14,6 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
-import matplotlib.colors as colors
 from matplotlib.animation import FuncAnimation
 import glob
 # ===================================================================================
@@ -68,8 +67,6 @@ def animate(frame):
     plt.imshow(plt.imread(png_files[frame]))
     # Remove axis from animated plot
     plt.axis('off')
-    # Remove the line below
-    plt.title(f'Frame #{(frame+1)}')
 # ===================================================================================
 # Creates plots from a singular .nc file, assumes 365 days in a year but will work with a (theoretically) infinite amount ot timesteps without issue.
 def create_plots_from_file(input_file_path, iscustom):
@@ -78,13 +75,15 @@ def create_plots_from_file(input_file_path, iscustom):
     size_of_time = dataset['prw'].time.size
     start_size_of_time = 0
     end_size_of_time = size_of_time
-    # Ask user here about how many months/years they want to generate
+    cust_cmap = "gist_yarg"
+    # If is_custom is 'y' set custom parameters
     if(iscustom == 'y'):
-        print(f"Total timesteps: {size_of_time}\n")
+        # Ask user here about how many months/years they want to generate
+        print(f"\nTotal timesteps: {size_of_time}\n")
         start_size_of_time = int(input("What timestep to start run at?\nTimestep num: "))
         end_size_of_time = int(input("What timestep to end run at?\nTimestep num: "))
-    # Ask user if they want to set a custom cmap
-    cust_cmap = "gist_yarg"
+        #  Custom cmap may be set here, default is gist_yarg
+        cust_cmap = input(f"Set custom colourmap, (Default is currently {cust_cmap}):\n")
     # Loops from 0 - 364
     for time_step in range(start_size_of_time, end_size_of_time):
                     # Subset of the original data to generate a plot
@@ -100,7 +99,6 @@ def create_plots_from_file(input_file_path, iscustom):
                     leading_zero_amnt -= 1
                     num_result = num_name
                     # Creates final number string for proper sorting
-                    
                     for i in range(leading_zero_amnt):
                         if(num_name < (10**leading_zero_amnt)):
                             num_result = "0" + str(num_result)
@@ -145,9 +143,8 @@ def create_plots_from_folder(path, iscustom):
 # Hardcoded paths to folder/file, replace as needed
 file_folder_path = "/space/hall5/sitestore/eccc/crd/ccrn/users/jcl001/jcl-retro-pi1850-1d0/data/nc_output/CMIP6/CCCma/CCCma/CanESM5-jcl-retro-pi1850-1d0/piControl/r1i1p1f1/Eday/prw/gn/v20190429"
 file_path = "/space/hall5/sitestore/eccc/crd/ccrn/users/jcl001/jcl-retro-pi1850-1d0/data/nc_output/CMIP6/CCCma/CCCma/CanESM5-jcl-retro-pi1850-1d0/piControl/r1i1p1f1/Eday/prw/gn/v20190429/prw_Eday_CanESM5-jcl-retro-pi1850-1d0_piControl_r1i1p1f1_gn_32500101-32501231.nc"
-test_path = "/space/hall5/sitestore/eccc/crd/ccrn/model_output/CMIP6/final/CMIP6/CMIP/CCCma/CanESM5/amip/r1i1p2f1/E3hr/prw/gn/v20190429/prw_E3hr_CanESM5_amip_r1i1p2f1_gn_195001010130-196012312230.nc"
 # ===================================================================================
-# Bounds for graph colourbars
+# Bounds for graph colourbars, can be changed depending on the data used
 std_min = 5
 std_max = 85
 # ===================================================================================
@@ -193,9 +190,6 @@ elif((action) == '4'):
 #     sorted_files = get_sorted_png_files()
 #     for i in range(len(sorted_files)):
 #         print(sorted_files[i])
-#
-#elif((action) == '6'):
-#    what_size(test_path)
 # Kills program
 else:
     exit()

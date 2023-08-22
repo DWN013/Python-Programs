@@ -22,6 +22,6 @@ Plots will theoretically scale to an infinite number of steps and can be animate
 so long as it is from the same .nc file (eg. timesteps 0-1000 and 2000-3000 can be combined in 1 gif)
 
 Colour map can be changed after selecting "y" for using custom parameters
-NOTE: Program does not check if colour map input is valid!
+NOTE: Program does not check if colour map input is valid and will crash if invalid input is provided!
 
 =======================================================================================================

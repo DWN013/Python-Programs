@@ -1,10 +1,10 @@
 # ===================================================================================
-# boundary_calc.py
+# boundary_calc_animate.py
 # A. Ukhin - August 8, 2023
 # -----------------------------------------------------------------------------------
 # Brief Description of Program:
 # Generates plots and animations to display water vapour movement over an arbitrary 
-#timespan from a .nc file and applies it over a Robinson projection of Earth with a 
+# timespan from a .nc file and applies it over a Robinson projection of Earth with a 
 # gist_yarg colour map 
 # ===================================================================================
 # Libraries necessesary for program
@@ -37,13 +37,13 @@ def generate_pngs():
     custom = str.lower(input("Set custom plot parameters?\n(Y)es\n(N)o or any other key (Uses system defaults)\n"))
     # Decision for if folder and if custome PATH or default
     if(use_default == 'y'):
-        # Following lines ues hardcoded path
+        # Following lines use hardcoded path
         if(generation_from == 'y'):
             create_plots_from_folder(file_folder_path, custom)
         elif(generation_from == 'n'):
             create_plots_from_file(file_path, custom)
     elif(use_default == 'n'):
-        # Following lines gets input path
+        # Following lines get input path
         if(generation_from == 'y'):
             create_plots_from_folder(input("Input folder path where files are located (/path/example/here)\n"), custom)
         elif(generation_from == 'n'):
@@ -62,7 +62,7 @@ def get_sorted_png_files():
 # ===================================================================================
 # Animation function definition
 def animate(frame):
-    plt.clf()  # Clear the previous frame
+    plt.clf()  # Clears the previous frame, WILL NOT WORK WITHOUT!
     # Put together frames
     plt.imshow(plt.imread(png_files[frame]))
     # Remove axis from animated plot
@@ -70,20 +70,27 @@ def animate(frame):
 # ===================================================================================
 # Creates plots from a singular .nc file, assumes 365 days in a year but will work with a (theoretically) infinite amount ot timesteps without issue.
 def create_plots_from_file(input_file_path, iscustom):
+    # Head (folder path) is unused, tail is actual filename
     head, tail = os.path.split(input_file_path)
+    # Open dataset for work
     dataset = xr.open_dataset(input_file_path)
     size_of_time = dataset['prw'].time.size
+    # Default definitions for start/end time to go through all timesteps by default
     start_size_of_time = 0
     end_size_of_time = size_of_time
+    # Default colourmap
     cust_cmap = "gist_yarg"
-    # If is_custom is 'y' set custom parameters
+    # If is_custom is 'y' sets custom parameters
     if(iscustom == 'y'):
         # Ask user here about how many months/years they want to generate
         print(f"\nTotal timesteps: {size_of_time}\n")
         start_size_of_time = int(input("What timestep to start run at?\nTimestep num: "))
         end_size_of_time = int(input("What timestep to end run at?\nTimestep num: "))
         #  Custom cmap may be set here, default is gist_yarg
-        cust_cmap = input(f"Set custom colourmap, (Default is currently {cust_cmap}):\n")
+        cust_cmap = input(f"Set custom colourmap (Press enter to use default)\n(Default is currently {cust_cmap}):\n")
+        # Assigns default value if no input is used
+        if(0 == len(cust_cmap)): cust_cmap = "gist_yarg"
+        print(f"\nPlotting with cmap {cust_cmap}\n")
     # Loops from 0 - 364
     for time_step in range(start_size_of_time, end_size_of_time):
                     # Subset of the original data to generate a plot
@@ -93,9 +100,13 @@ def create_plots_from_file(input_file_path, iscustom):
                     # Params for naming end of file number
                     num_name = time_step
                     total_timesteps = size_of_time
+                    # Calculates amount of leading zeroes to add to plot filenames
+                    # Starts at 1 instead of 0 since 10**0 == 1, creates pointless calculation
                     leading_zero_amnt = 1
+                    # Performs floor division by factors of 10 while result is more than zero
                     while((total_timesteps // 10**leading_zero_amnt) > 0):
                         leading_zero_amnt += 1
+                    # Prevents an extra zero from being added
                     leading_zero_amnt -= 1
                     num_result = num_name
                     # Creates final number string for proper sorting
@@ -150,7 +161,7 @@ print("=========================================================================
 if(action == '1' or action == '3'): 
     gif_name = input("Name the GIF file: (Leave blank for default \'test.gif\' name)\n")
     if(0 == len(gif_name)): gif_name = "test"
-    print(f"Animation will be named {gif_name}.gif\n")
+    print(f"\nAnimation will be named {gif_name}.gif\n")
 # Defined actions to be taken
 if((action) == '1'):
     # Generates plot(s) in png(s) from .nc file(s)
@@ -189,9 +200,3 @@ elif((action) == '4'):
 else:
     exit()
 # ===================================================================================
-
-
-
-
-
-
